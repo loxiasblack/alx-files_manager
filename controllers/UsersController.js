@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class UsersController {
   static async postNew(req, res) {
@@ -20,6 +21,23 @@ class UsersController {
       const hashedPassword = hash.digest('hex');
       const newUser = await dbClient.addUser({ email, password: hashedPassword });
       return res.status(201).send({ id: newUser.insertedId, email });
+    } catch (error) {
+      return res.status(500).send({ error });
+    }
+  }
+
+  static async getMe(req, res) {
+    try {
+      const token = req.header('x-token');
+      if (!token) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const userInfo = await redisClient.get(`auth_${token}`);
+      if (!userInfo) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const user = await dbClient.getUserById(userInfo);
+      return res.status(200).send({ email: user.email, id: user._id });
     } catch (error) {
       return res.status(500).send({ error });
     }

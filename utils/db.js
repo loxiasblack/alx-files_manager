@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 /**
  * Class DBClient
  * @class DBClient
@@ -35,6 +35,10 @@ class DBClient {
 
   async getUser(email) {
     return this.client.db(this.database).collection('users').findOne({ email });
+  }
+
+  async getUserById(userId) {
+    return this.client.db(this.database).collection('users').findOne({ _id: ObjectId(userId) });
   }
 }
 
