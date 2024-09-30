@@ -37,6 +37,9 @@ class UsersController {
         return res.status(401).send({ error: 'Unauthorized' });
       }
       const user = await dbClient.getUserById(userInfo);
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
       return res.status(200).send({ email: user.email, id: user._id });
     } catch (error) {
       return res.status(500).send({ error });
