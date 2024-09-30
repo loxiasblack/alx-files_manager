@@ -2,7 +2,11 @@ import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
-
+/**
+ * AuthController class
+ * @class AuthController
+ * @description AuthController class
+ */
 class AuthController {
   static async getConnect(req, res) {
     try {
@@ -22,7 +26,7 @@ class AuthController {
       }
       const token = uuidv4();
       const key = `auth_${token}`;
-      await redisClient.set(key, user._id.toString(), 86400);
+      await redisClient.set(key, user._id.toString(), 86400000);
       return res.status(200).send({ token });
     } catch (error) {
       return res.status(500).send({ error });

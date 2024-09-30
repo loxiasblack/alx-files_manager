@@ -1,7 +1,11 @@
 import crypto from 'crypto';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
-
+/**
+ * UsersController class
+ * @class UsersController
+ * @description UsersController class
+ */
 class UsersController {
   static async postNew(req, res) {
     try {
