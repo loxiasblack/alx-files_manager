@@ -57,7 +57,7 @@ class FilesController {
           name,
           type,
           parentId: file.parentId,
-          isPublic: file.isPublic
+          isPublic: file.isPublic,
         });
       }
       const convertedData = Buffer.from(data, 'base64').toString('utf-8');
@@ -75,8 +75,9 @@ class FilesController {
         userId: file.userId,
         name,
         type,
-        parentId: file.parentId, isPublic: file.isPublic });
-
+        parentId: file.parentId,
+        isPublic: file.isPublic,
+      });
     } catch (error) {
       console.error(`the error is ${error}`);
       return res.status(500).send({ error });
