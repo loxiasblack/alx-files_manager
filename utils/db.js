@@ -40,6 +40,14 @@ class DBClient {
   async getUserById(userId) {
     return this.client.db(this.database).collection('users').findOne({ _id: ObjectId(userId) });
   }
+
+  async getfilebyid(parentId) {
+    return this.client.db(this.database).collection('files').findOne({ _id: ObjectId(parentId) });
+  }
+
+  async addFile(file) {
+    return this.client.db(this.database).collection('files').insertOne(file);
+  }
 }
 
 const dbClient = new DBClient();
