@@ -94,7 +94,7 @@ class FilesController {
     if (!user) {
       return res.status(401).send({ error: 'Unauthorized' });
     }
-    const { id } = req.params.id;
+    const  id  = req.params.id;
     const file = await dbClient.getfilebyid(id);
     if (!file) {
       return res.status(404).send({ error: 'Not found' });
