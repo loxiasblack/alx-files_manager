@@ -123,8 +123,8 @@ class FilesController {
       if (!user) {
         return res.status(401).send({ error: 'Unauthorized' });
       }
-      const { parentId } = req.query.parentId;
-      const { page } = req.query.page;
+      const  parentId  = req.query.parentId;
+      const  page  = req.query.page;
       if (parentId || page) {
         const pageSize = 20;
         const skip = parseInt(page, 10) * pageSize;
@@ -141,6 +141,10 @@ class FilesController {
       console.error(`the error is ${error}`);
       return res.status(500).send({ error });
     }
+  }
+
+  static async putPublish(req, res) {
+
   }
 }
 
