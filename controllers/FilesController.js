@@ -212,6 +212,43 @@ class FilesController {
       return res.status(500).send({ error });
     }
   }
+
+  static async getFile(req, res) {
+    const id = req.params.id;
+    const file = await dbClient.getfilebyid(id);
+    if (!file) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    if (!file.isPublic) {
+      const token = req.header('x-token');
+      if (!token) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+      const userInfo = await redisClient.get(`auth_${token}`);
+      if (!userInfo) {
+        return res.status(404).send({ error: 'Unauthorized' });
+      }
+      const user = await dbClient.getUserById(userInfo);
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const localPath = file.localPath;
+      const read = fs.readFileSync(localPath, 'utf-8');
+      if (!read) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+      return res.status(200).send(read);
+    }
+    if (file.type === 'folder') {
+      return res.status(400).send({ error: 'A folder doesn\'t have content' });
+    }
+    const localPath = file.localPath;
+    const read = fs.readFileSync(localPath, 'utf-8');
+    if (!read) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    return res.status(200).send(read);
+  }
 }
 
 export default FilesController;
