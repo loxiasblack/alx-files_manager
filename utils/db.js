@@ -68,6 +68,14 @@ class DBClient {
   async getAllDocument() {
     return this.client.db(this.database).collection('files').find().toArray();
   }
+  
+  async updateisPublic(id, isPublic) {
+    return this.client.db(this.database).collection('files').updateOne({ _id: ObjectId(id) }, { $set: { isPublic } });
+  }
+
+  async getfilebyidandUserId(id, userId) {
+    return this.client.db(this.database).collection('files').findOne({ _id: ObjectId(id), userId: ObjectId(userId) });
+  }
 }
 
 const dbClient = new DBClient();

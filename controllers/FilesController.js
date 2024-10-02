@@ -144,7 +144,73 @@ class FilesController {
   }
 
   static async putPublish(req, res) {
+    try {
+      const token = req.header('x-token');
+      const userInfo = await redisClient.get(`auth_${token}`);
+      if (!userInfo) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const user = await dbClient.getUserById(userInfo);
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const id = req.params.id;
+      const userId = user._id;
 
+      const file = await dbClient.getfilebyidandUserId(id, userId);
+      if (!file) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+      const isPublic = true;
+      await dbClient.updateisPublic(id, isPublic);
+      const updatedFile = await dbClient.getfilebyid(id);
+      return res.status(200).send({
+        id: updatedFile._id,
+        userId: updatedFile.userId,
+        name: updatedFile.name,
+        type: updatedFile.type,
+        isPublic: updatedFile.isPublic,
+        parentId: updatedFile.parentId,
+      });
+    } catch (error) {
+      console.error(`the error is ${error}`);
+      return res.status(500).send({ error });
+    }
+  }
+
+  static async putUnpublish(req, res) {
+    try {
+      const token = req.header('x-token');
+      const userInfo = await redisClient.get(`auth_${token}`);
+      if (!userInfo) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const user = await dbClient.getUserById(userInfo);
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const id = req.params.id;
+      const userId = user._id;
+
+      const file = await dbClient.getfilebyidandUserId(id, userId);
+      if (!file) {
+        return res.status(404).send({ error: 'Not found' });
+      }
+      const isPublic = false;
+      await dbClient.updateisPublic(id, isPublic);
+      const updatedFile = await dbClient.getfilebyid(id);
+      return res.status(200).send({
+        id: updatedFile._id,
+        userId: updatedFile.userId,
+        name: updatedFile.name,
+        type: updatedFile.type,
+        isPublic: updatedFile.isPublic,
+        parentId: updatedFile.parentId,
+      });
+    } catch (error) {
+      console.error(`the error is ${error}`);
+      return res.status(500).send({ error });
+    }
   }
 }
 
