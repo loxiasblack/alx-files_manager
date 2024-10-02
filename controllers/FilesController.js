@@ -83,6 +83,65 @@ class FilesController {
       return res.status(500).send({ error });
     }
   }
+
+  static async getShow(req, res) {
+    const token = req.header('x-token');
+    const userInfo = await redisClient.get(`auth_${token}`);
+    if (!userInfo) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    const user = await dbClient.getUserById(userInfo);
+    if (!user) {
+      return res.status(401).send({ error: 'Unauthorized' });
+    }
+    const { id } = req.params.id;
+    const file = await dbClient.getfilebyid(id);
+    if (!file) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    if (file.userId.toString() !== user._id.toString()) {
+      return res.status(404).send({ error: 'Not found' });
+    }
+    return res.status(200).send({
+      id: file._id,
+      userId: file.userId,
+      name: file.name,
+      type: file.type,
+      isPublic: file.isPublic,
+      parentId: file.parentId,
+    });
+  }
+
+  static async getIndex(req, res) {
+    try {
+      const token = req.header('x-token');
+      const userInfo = await redisClient.get(`auth_${token}`);
+      if (!userInfo) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const user = await dbClient.getUserById(userInfo);
+      if (!user) {
+        return res.status(401).send({ error: 'Unauthorized' });
+      }
+      const { parentId } = req.query.parentId;
+      const { page } = req.query.page;
+      if (parentId || page) {
+        const pageSize = 20;
+        const skip = parseInt(page, 10) * pageSize;
+        const query = {
+          userId: user._id,
+          parentId: parentId || 0,
+        };
+        const files = await dbClient.getfileDocument(query, skip, pageSize);
+        return res.status(200).send(files);
+      }
+      const files = await dbClient.getAllDocument();
+      return res.status(200).send(files);
+    } catch (error) {
+      console.error(`the error is ${error}`);
+      return res.status(500).send({ error });
+    }
+  }
 }
 
 export default FilesController;

@@ -48,6 +48,26 @@ class DBClient {
   async addFile(file) {
     return this.client.db(this.database).collection('files').insertOne(file);
   }
+
+  async getFilebyParentId(parentId) {
+    return this.client.db(this.database).collection('files').find({ parentId });
+  }
+
+  async getFilebyUserId(userId) {
+    return this.client.db(this.database).collection('files').find({ userId: ObjectId(userId) });
+  }
+
+  async getfileDocument(query, skip, limit) {
+    return this.client.db(this.database).collection('files')
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+  }
+
+  async getAllDocument() {
+    return this.client.db(this.database).collection('files').find().toArray();
+  }
 }
 
 const dbClient = new DBClient();
